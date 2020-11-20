@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Okemos Solar Car Live Car Dashboard</title>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="black-translucent"
+        />
+        <link rel="apple-touch-icon" href="/static/src.png" />
+        <link rel="stylesheet" href="/static/bulma.css" />
+        <script
+            src="https://use.fontawesome.com/releases/v5.8.1/js/all.js"
+            data-auto-replace-svg="nest"
+        ></script>
+        <link type="text/css" rel="stylesheet" href="/static/styles.css" />
+        <link rel="shortcut icon" type="image/x-icon" href="/static/src.png" />
+        <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+        <script
+            type="text/javascript"
+            src="https://www.gstatic.com/charts/loader.js"
+        ></script>
+        <script type="text/javascript" charset="utf-8">
+            function showTime() {
+                var date = new Date();
+                var h = date.getHours(); // 0 - 23
+                var m = date.getMinutes(); // 0 - 59
+                var s = date.getSeconds(); // 0 - 59
+                var session = "AM";
+                if (h == 0) {
+                    h = 12;
+                }
+                if (h >= 12) {
+                    session = "PM";
+                    if (h > 12) {
+                        h = h - 12;
+                    }
+                }
+                h = h < 10 ? "0" + h : h;
+                m = m < 10 ? "0" + m : m;
+                s = s < 10 ? "0" + s : s;
+                var time = h + ":" + m + ":" + s + " " + session;
+                document.getElementById("MyClockDisplay").innerHTML = time;
+            }
+
+            setInterval(showTime, 1000);
+
+            var x;
+
+            function startStop() {
+                let startstop = document.getElementById("start").innerHTML;
+                if (startstop === "Start") {
+                    document.getElementById("start").innerHTML = "Stop";
+                    start();
+                } else if (startstop === "Stop") {
+                    document.getElementById("start").innerHTML = "Start";
+                    stop();
+                }
+            }
+
+            function start() {
+                timer();
+                x = setInterval(timer, 1000);
+            }
+
+            function stop() {
+                clearInterval(x);
+            }
+
+            var sec = 0;
+            var secOut = 0;
+            var min = 0;
+            var minOut = 0;
+            var hour = 0;
+            var hourOut = 0;
+
+            function timer() {
+                secOut = checkTime(sec);
+                minOut = checkTime(min);
+                hourOut = checkTime(hour);
+                sec += 1;
+                if (sec == 60) {
+                    min += 1;
+                    sec = 0;
+                }
+                if (min == 60) {
+                    min = 0;
+                    hour += 1;
+                }
+                document.getElementById("sec").innerHTML = secOut;
+                document.getElementById("min").innerHTML = minOut;
+                document.getElementById("hour").innerHTML = hourOut;
+            }
+
+            function checkTime(i) {
+                if (i < 10) {
+                    i = "0" + i;
+                }
+                return i;
+            }
+
+            function reset() {
+                sec = 0;
+                min = 0;
+                hour = 0;
+                document.getElementById("sec").innerHTML = "00";
+                document.getElementById("min").innerHTML = "00";
+                document.getElementById("hour").innerHTML = "00";
+            }
+
+            function floatify(x) {
+                return Number.parseFloat(x).toFixed(2);
+            }
+
+            function setlast(clt) {
+                document.getElementById("lastlap").innerText = clt;
+            }
+        </script>
+        <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-database.js"></script>
+        <script>
+            var config = {
+                apiKey: "webAPIKey",
+                authDomain: "firebase-url.firebaseapp.com",
+                databaseURL: "https://firebase-url.firebaseio.com",
+                storageBucket: "",
+            };
+
+            firebase.initializeApp(config);
+            var database = firebase.database();
+
+            /*
+These functions are unnecessary as they are slower than the new direct method over local network.
+
+setInterval(function() {
+    charge(function(battery) {
+        document.getElementById('battery').innerHTML = battery.toString() + "%";
+    });
+}, 30000);
+
+function weather(_callback) {
+    wet = [];
+    firebase.database().ref('weather/current_condition').once('value').then(function(snapshot) {
+        wet.push(snapshot.val());
+    });
+    firebase.database().ref('weather/current_temp').once('value').then(function(snapshot) {
+        wet.push(snapshot.val());
+    });
+    firebase.database().ref('weather/current_wind').once('value').then(function(snapshot) {
+        wet.push(snapshot.val());
+    });
+    _callback(wet);
+}
+
+function gps(_callback) {
+    loc = [];
+    firebase.database().ref('location/city').once('value').then(function(snapshot) {
+        loc.push(snapshot.val());
+    });
+    firebase.database().ref('location/latitude').once('value').then(function(snapshot) {
+        loc.push(snapshot.val());
+    });
+    firebase.database().ref('location/longitude').once('value').then(function(snapshot) {
+        loc.push(snapshot.val());
+    });
+    _callback(loc);
+}
+
+function recent(_callback) {
+    firebase.database().ref('last_update').once('value').then(function(snapshot) {
+        var last = new Date(snapshot.val().replace(/\s/, 'T')+'Z');
+        var last = last.getTime();
+        var current = new Date().getTime();
+        if (last >= (current - 5000)) {
+            _callback(true);
+        } else {
+            _callback(false);
+        }
+    });
+}
+
+function charge(_callback) {
+    firebase.database().ref('charge').once('value').then(function(snapshot) {
+        _callback(snapshot.val());
+    });
+}
+
+var speed = firebase.database().ref('speed');
+speed.on('value', function (snapshot) {
+    document.getElementById('speed').innerHTML = snapshot.val() + ' mph';
+    setGauge(snapshot.val())
+});
+
+var volt = firebase.database().ref('charge');
+volt.on('value', function (snapshot) {
+    document.getElementById('battery').innerHTML = snapshot.val() + 'Volts';
+});
+
+*/
+
+            var speed = firebase.database().ref("speed");
+            speed.on("value", function (snapshot) {
+                let newspeed = Number(snapshot.val());
+                setGauge(newspeed);
+            });
+
+            var avgspeed = firebase.database().ref("avgspeed");
+            avgspeed.on("value", function (snapshot) {
+                let newspeed = Number(snapshot.val());
+                document.getElementById("speed").innerHTML = newspeed + " mph";
+            });
+
+            var volt = firebase.database().ref("charge");
+            volt.on("value", function (snapshot) {
+                let voltage = snapshot.val();
+                document.getElementById("battery").innerHTML =
+                    voltage + " volts";
+                if (!isNaN(voltage)) {
+                    var vnum = Number(voltage);
+                    var charges = {
+                        60: 110,
+                        55: 105,
+                        52: 100,
+                        51.5: 95,
+                        51: 90,
+                        50.5: 85,
+                        50: 80,
+                        49.6: 75,
+                        49.2: 70,
+                        48.9: 65,
+                        48.6: 60,
+                        48.4: 55,
+                        48.2: 50,
+                        48: 45,
+                        47.8: 40,
+                        47.52: 35,
+                        47.24: 30,
+                        46.94: 25,
+                        46.64: 20,
+                        46.35: 15,
+                        46.04: 10,
+                        44.02: 5,
+                        42: 0,
+                    };
+                    var result;
+                    var prev;
+                    for (var key in charges) {
+                        var dist = Math.abs(key - vnum);
+                        if (dist < prev || result === undefined) {
+                            prev = dist;
+                            result = key;
+                        }
+                    }
+                    var battper = charges[result];
+                    document.getElementById("bper").innerHTML = battper + "%";
+                }
+            });
+
+            var odometer = firebase.database().ref("odometer");
+            odometer.on("value", function (snapshot) {
+                document.getElementById("odometer").innerHTML =
+                    Math.round((snapshot.val() / 63360) * 100) / 100 + " miles";
+            });
+
+            var trip = firebase.database().ref("trip_distance");
+            trip.on("value", function (snapshot) {
+                document.getElementById("trip").innerHTML =
+                    Math.round((snapshot.val() / 63360) * 100) / 100 + " miles";
+            });
+
+            var messages = firebase.database().ref("message");
+            messages.on("value", function (snapshot) {
+                let msg = snapshot.val();
+                let chat = $("#msgs");
+                chat.html(msg);
+                chat.addClass("newmsg");
+                setTimeout(function () {
+                    chat.removeClass("newmsg");
+                }, 5000);
+            });
+
+            var cautions = firebase.database().ref("caution");
+            cautions.on("value", function (snapshot) {
+                let msg = snapshot.val();
+                let chat = $("#caution");
+                chat.html(msg);
+                chat.addClass("newmsg");
+                setTimeout(function () {
+                    chat.removeClass("newmsg");
+                }, 5000);
+            });
+
+            var lap = firebase.database().ref("laps");
+            lap.on("value", function (snapshot) {
+                document.getElementById("lap").innerHTML =
+                    snapshot.val() + " laps";
+                stop();
+                setlast(document.getElementById("clt").innerText);
+                reset();
+                start();
+            });
+
+            var cumlap = firebase.database().ref("cumlaps");
+            cumlap.on("value", function (snapshot) {
+                document.getElementById("cumlap").innerHTML =
+                    snapshot.val() + " laps";
+            });
+        </script>
+        <script type="text/javascript">
+            google.charts.load("current", { packages: ["gauge"] });
+            google.charts.setOnLoadCallback(drawGauge);
+
+            var gaugeOptions = {
+                min: 0,
+                max: 37.8,
+                yellowFrom: 18.9,
+                yellowTo: 28.35,
+                redFrom: 28.35,
+                redTo: 37.8,
+                majorTicks: 10,
+                minorTicks: 5,
+            };
+            var gauge;
+            var gaugeData;
+
+            function drawGauge() {
+                gaugeData = new google.visualization.DataTable();
+                gaugeData.addColumn("number", "Speed");
+                gaugeData.addRows(1);
+                gaugeData.setCell(0, 0, 0);
+
+                gauge = new google.visualization.Gauge(
+                    document.getElementById("gauge_div")
+                );
+                gauge.draw(gaugeData, gaugeOptions);
+            }
+
+            function setGauge(dir) {
+                gaugeData.setValue(0, 0, dir);
+                gauge.draw(gaugeData, gaugeOptions);
+            }
+        </script>
+    </head>
+    <body id="body">
+        <div style="width: 100%; height: 20px"></div>
+        <div class="columns pretend-body is-centered is-hidden-mobile">
+            <div class="column is-half center-items">
+                <div
+                    class="hero chart_container"
+                    style="justify-content: flex-start"
+                >
+                    <div
+                        class=""
+                        id="gauge_div"
+                        style="width: 450px; height: 450px"
+                    ></div>
+                    <p class="subtitle is-3">
+                        Current Lap Time:
+                        <span id="clt" class="title is-3"
+                            ><span id="hour">00</span>:<span id="min">00</span
+                            >:<span id="sec">00</span></span
+                        >
+                    </p>
+                    <p class="subtitle is-3">
+                        Home base: <b class="title is-3" id="msgs"></b>
+                    </p>
+                </div>
+            </div>
+            <div id="stats" class="column is-half">
+                <div class="level">
+                    <div class="level-item">
+                        <p class="subtitle is-3">
+                            Time:
+                            <span
+                                id="MyClockDisplay"
+                                onload="showTime()"
+                                class="title is-3"
+                            ></span>
+                        </p>
+                    </div>
+                </div>
+                <div class="level">
+                    <div class="level-item">
+                        <p class="subtitle is-3" style="margin-bottom: 0">
+                            Battery:
+                            <span class="title is-3" id="battery"
+                                >-- volts</span
+                            >
+                        </p>
+                    </div>
+                </div>
+                <div class="level">
+                    <div class="level-item">
+                        <p class="subtitle is-3" style="margin-bottom: 0">
+                            Battery:
+                            <span class="title is-3" id="bper">--%</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="level">
+                    <div class="level-item">
+                        <p class="subtitle is-3">
+                            Laps: <span class="title is-3" id="lap"></span> |
+                            <span class="title is-3" id="cumlap"></span>
+                        </p>
+                    </div>
+                </div>
+                <div class="level">
+                    <div class="level-item">
+                        <p class="subtitle is-3">
+                            Last Lap Time:
+                            <span class="title is-3" id="lastlap"></span>
+                        </p>
+                    </div>
+                </div>
+                <div class="level">
+                    <div class="level-item">
+                        <p class="subtitle is-3">
+                            Average Speed:
+                            <span class="title is-3" id="speed">-- mph</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="level">
+                    <div class="level-item">
+                        <p class="subtitle is-3">
+                            Total Distance:
+                            <span class="title is-3" id="odometer"
+                                >-- miles</span
+                            >
+                        </p>
+                    </div>
+                </div>
+                <div class="level">
+                    <div class="level-item">
+                        <p class="subtitle is-3">
+                            Current Distance:
+                            <span class="title is-3" id="trip">-- miles</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="level">
+                    <div class="level-item">
+                        <p class="subtitle is-3">
+                            Cautions: <b class="title is-3" id="caution"></b>
+                        </p>
+                    </div>
+                </div>
+                <br />
+            </div>
+        </div>
+    </body>
+</html>

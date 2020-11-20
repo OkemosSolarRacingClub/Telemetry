@@ -1,0 +1,212 @@
+#body {
+    background-color: #212121;
+    height: 768px;
+    width: 1024px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    color: #E0E0E0;
+}
+
+#other-body {
+    min-width: 100%;
+    min-height: 100vh;
+    background-color: #212121;
+    color: #E0E0E0;
+    overflow: hidden;
+}
+
+.pretend-body {
+
+}
+
+#back {
+    position: absolute;
+    top: 45px;
+    left: 520px;
+    width: 167px;
+    height: 500px;
+}
+
+#pause {
+    position: absolute;
+    top: 45px;
+    left: 687px;
+    width: 167px;
+    height: 500px;
+}
+
+#next {
+    position: absolute;
+    top: 45px;
+    left: 854px;
+    width: 167px;
+    height: 500px;
+}
+
+.song-progress {
+    width: 100%;
+    display: inline-block;
+}
+
+#playback {
+    display: none;
+}
+
+.flexbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.columns.is-vcentered {
+  -webkit-box-align: center;
+     -ms-flex-align: center;
+        align-items: center;
+}
+
+#album_cover {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.rounded {
+    border-radius: 10px;
+    background-color: #424242;
+    color: #E0E0E0;
+}
+
+#spotify {
+    margin-right: 10px;
+}
+
+.title {
+    color: #E0E0E0;
+}
+
+.subtitle {
+    color: #b4b4b4;
+}
+
+.button.togglebutton {
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 0;
+    border-radius: 10px;
+    background-color: #424242;
+    color: #B4B4B4;
+}
+
+.button.togglebutton2 {
+    margin-top: 0;
+    margin-left: auto;
+    margin-right: auto;
+    border: 0;
+    border-radius: 10px;
+    background-color: #424242;
+    color: #B4B4B4;
+}
+
+.center-items {
+    display: flex;
+    justify-content: center;
+}
+
+.click-through {
+    pointer-events: none;
+}
+
+.button.togglebutton:hover, .button.togglebutton:visited {
+
+}
+
+.bringerup {
+    margin-top: -7.5px;
+}
+
+.mobile-login {
+    background-color: white;
+    color: black;
+    max-width: 99%;
+    overflow-x: scroll;
+    margin: 5px;
+    padding: 5px;
+}
+
+#chart_div {
+}
+
+.chart_container {
+    max-width: 450px;
+    max-height: 768px;
+}
+
+circle:nth-of-type(2) {
+    fill: #212121;
+    stroke: black;
+}
+
+svg > g:first-of-type > circle:first-of-type {
+    stroke: black;
+    fill: #b4b4b4;
+}
+
+text:nth-of-type(1) {
+    fill: #b4b4b4;
+}
+
+.newmsg {
+    -webkit-animation-name: newmsganimation; /* Safari 4.0 - 8.0 */
+    -webkit-animation-duration: 5s; /* Safari 4.0 - 8.0 */
+    animation-name: newmsganimation;
+    animation-duration: 5s;
+}
+
+/* Safari 4.0 - 8.0 */
+@-webkit-keyframes newmsganimation {
+    0% {background-color: transparent; color: #E0E0E0; font-size: 1.5rem;}
+    5% {background-color: yellow; color: black; font-size: 2.5rem;}
+    95% {background-color: yellow; color: black; font-size: 2.5rem;}
+    100% {background-color: transparent; color: #E0E0E0; font-size: 1.5rem;}
+}
+
+/* Standard syntax */
+@keyframes newmsganimation {
+    0% {background-color: transparent; color: #E0E0E0; font-size: 1.5rem;}
+    5% {background-color: yellow; color: black; font-size: 2.5rem;}
+    95% {background-color: yellow; color: black; font-size: 2.5rem;}
+    100% {background-color: transparent; color: #E0E0E0; font-size: 1.5rem;}
+}
+
+.newmsg2 {
+    -webkit-animation-name: newmsganimation2; /* Safari 4.0 - 8.0 */
+    -webkit-animation-duration: 5s; /* Safari 4.0 - 8.0 */
+    animation-name: newmsganimation2;
+    animation-duration: 5s;
+}
+
+/* Safari 4.0 - 8.0 */
+@-webkit-keyframes newmsganimation2 {
+    0% {background-color: transparent; color: #E0E0E0; font-size: 3.75rem;}
+    5% {background-color: yellow; color: black; font-size: 4.5rem;}
+    95% {background-color: yellow; color: black; font-size: 4.5rem;}
+    100% {background-color: transparent; color: #E0E0E0; font-size: 3.75rem;}
+}
+
+/* Standard syntax */
+@keyframes newmsganimation2 {
+    0% {background-color: transparent; color: #E0E0E0; font-size: 3.75rem;}
+    5% {background-color: yellow; color: black; font-size: 4.5rem;}
+    95% {background-color: yellow; color: black; font-size: 4.5rem;}
+    100% {background-color: transparent; color: #E0E0E0; font-size: 3.75rem;}
+}
+
+.title.is-1.bigger {
+    font-size: 3.75rem;
+    color: white;
+}
+
+.subtitle.is-1.bigger {
+    font-size: 3.75rem;
+    color: white;
+}

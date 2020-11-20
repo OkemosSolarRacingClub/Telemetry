@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Send Message</title>
+</head>
+<body>
+<script>
+    let msg = prompt("Message for car?");
+    if (msg !== null) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "/message", true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhttp.send("msg=" + msg);
+    }
+</script>
+</body>
+</html>
